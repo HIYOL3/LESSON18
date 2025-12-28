@@ -1,12 +1,12 @@
 import pyxel
 import time
 import random
-
+import math
 # 画面サイズ
 W = 160
 H = 120
 CELL = 8  # 1マスの大きさ（8x8）
-
+game_over2 = False
 # グリッドのマス数
 GRID_W = W // CELL  # 20
 GRID_H = H // CELL  # 15
@@ -18,10 +18,11 @@ dy = 0  # 移動方向（y）
 
 # エサ
 food = (8, 8)
-
+score = 0
 # ゲーム状態
 game_over = False
-
+move = 0
+move_time = 0
 # 移動のスピード調整用
 last_move_time = time.time()
 
@@ -37,7 +38,11 @@ def place_food():
 
 
 def update():
-    global dx, dy, last_move_time, game_over
+    global dx, dy, last_move_time, game_over,score,now,move,move_time,game_over2
+
+    if game_over==True or  game_over2 == True:
+        time.sleep(3)
+        pyxel.quit()
 
     # 方向転換（逆走は不可にしている）
     if pyxel.btnp(pyxel.KEY_LEFT) and dx != 1:
@@ -49,13 +54,19 @@ def update():
     if pyxel.btnp(pyxel.KEY_DOWN) and dy != -1:
         dx, dy = 0, 1
 
+    if pyxel.btnp(pyxel.KEY_RETURN):
+        snake.pop()
+        score -= 20
     now = time.time()
 
     # 0.2秒毎に1マス進む
-    if now - last_move_time < 0.2:
+    if now - last_move_time < 0.15:
         return
-    
     last_move_time = now
+
+    if snake == []:
+        game_over2 = True
+        return
 
     # 新しい頭の位置
     head_x, head_y = snake[0]
@@ -79,6 +90,7 @@ def update():
     if (new_x, new_y) == food:
         # 体を伸ばす
         place_food()
+        score += 10
     else:
         # 何も食べていないので、しっぽを削除して長さを保つ
         snake.pop()
@@ -96,7 +108,11 @@ def draw():
         color = 11 if i == 0 else 7  # 頭だけ色を変える
         pyxel.rect(x * CELL, y * CELL, CELL, CELL, color)
 
-
+    if game_over==True:
+        pyxel.text(65,50,"game over",9)
+    pyxel.text(5, 10, f"Score: {score}", 7)
+    if game_over2 == True:
+        pyxel.text(75,50,"why?",9)
 # ゲーム開始
 pyxel.init(W, H, title="Snake Sample")
 pyxel.run(update, draw)
