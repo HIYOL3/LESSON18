@@ -17,7 +17,7 @@ dx = 1  # 移動方向（x）
 dy = 0  # 移動方向（y）
 
 # エサ
-food = (5, 5)
+food = (8, 8)
 
 # ゲーム状態
 game_over = False
